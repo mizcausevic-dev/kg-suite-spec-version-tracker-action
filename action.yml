@@ -1,0 +1,37 @@
+name: "Kinetic Gain Suite Spec-Version Tracker"
+description: "Walk a mixed-protocol directory of Kinetic Gain Suite JSON documents (AgentCards, MCP Tool Cards, prompt-provenance, evidence bundles, OTLP traces, MCP tools/list), group by (protocol, spec_version), flag fleet-wide version drift, post a Markdown summary as a PR comment, and fail the build when drift is detected."
+author: "mizcausevic-dev"
+branding:
+  icon: "git-branch"
+  color: "yellow"
+
+inputs:
+  dir:
+    description: "Directory containing *.json Kinetic Gain Suite documents (mixed protocols supported)."
+    required: true
+  comment-on-pr:
+    description: "Post the Markdown summary as a PR comment. 'auto' (default) posts only on pull_request events; 'true' / 'false' force the behavior."
+    required: false
+    default: "auto"
+  fail-on-drift:
+    description: "Fail the run when any protocol has ≥ 2 distinct spec versions in use (default 'true')."
+    required: false
+    default: "true"
+  github-token:
+    description: "Token used to post the PR comment (defaults to GITHUB_TOKEN)."
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  total-files:
+    description: "Number of JSON files analyzed."
+  protocols-detected:
+    description: "Number of distinct Suite protocols detected."
+  drift-buckets:
+    description: "Number of protocols with version drift (≥ 2 distinct versions)."
+  unknown-docs:
+    description: "Number of JSON files that did not match any known Suite spec."
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
